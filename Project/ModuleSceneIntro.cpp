@@ -6,6 +6,8 @@
 #include "ModuleTextures.h"
 #include "ModuleAudio.h"
 #include "ModulePhysics.h"
+#include "ModuleAudio.h"
+
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
@@ -26,10 +28,75 @@ bool ModuleSceneIntro::Start()
 	App->renderer->camera.x = App->renderer->camera.y = 0;
 
 	pinball = App->textures->Load("textures/spritesheet.png"); 
+	App->audio->PlayMusic("music/Sapphire_field.ogg", -1);
 	bonus_fx = App->audio->LoadFx("audio/bonus.wav");
 
 	//sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
 	background = { 803, 6, SCREEN_WIDTH, SCREEN_HEIGHT };
+	background1 = { 18, 6, SCREEN_WIDTH, 344 };
+	background2 = { 410, 6, SCREEN_WIDTH, 576 };
+
+	//water
+	water.PushBack({ 1010, 731, 57, 63 });
+	water.PushBack({ 1070, 731, 57, 63 });
+	water.PushBack({ 1130, 731, 57, 63 });
+	water.speed = 0.05f;
+
+	//Spoink
+	spoink.PushBack({ 876, 1430, 31, 75 });
+	spoink.PushBack({ 909, 1430, 31, 75 });
+	spoink.speed = 0.05f;
+
+	downSpoink.PushBack({ 942, 1430, 31, 75 });
+	downSpoink.PushBack({ 975, 1430, 31, 75 });
+	redSpoink.PushBack({ 1008, 1430, 33, 75 });
+	redSpoink.PushBack({ 1039, 1430, 33, 75 });
+	redSpoink.PushBack({ 1071, 1430, 33, 75 });
+	redSpoink.speed = 0.3f;
+	
+	//Pikachu
+	pikachu.PushBack({ 162, 2000, 38, 36 });
+	pikachu.PushBack({ 200, 2000, 38, 36 });
+	pikachu.speed = 0.05f;
+	pikachu_pos = 30;
+
+	//Mart
+	mart.PushBack({ 310, 733, 75, 55 });
+	mart.PushBack({ 387, 733, 75, 55 });
+	mart.PushBack({ 463, 733, 75, 55 });
+	mart.speed = 0.08f;
+
+	//shroomish
+	shroomish.PushBack({ 94, 1471, 41, 36 });
+	shroomish.PushBack({ 137, 1471, 41, 36 });
+	shroomish.speed = 0.02f;
+
+	//Pluse
+	plusle.PushBack({ 157, 1527, 34, 55 });
+	plusle.PushBack({ 193, 1527, 34, 55 });
+	plusle.PushBack({ 229, 1527, 34, 55 });
+	plusle.speed = 0.08f;
+
+	//Minum
+	minum.PushBack({ 157, 1594, 34, 55 });
+	minum.PushBack({ 193, 1594, 34, 55 });
+	minum.PushBack({ 229, 1594, 34, 55 });
+	minum.speed = 0.08f;
+
+	//Wailmer
+	wailmer.PushBack({ 265, 1461, 52, 44 });
+	wailmer.PushBack({ 319, 1461, 57, 44 });
+	wailmer.speed = 0.07f;
+
+	//Pelipper
+	pelipper.PushBack({ 111, 1375, 61, 52 });
+	pelipper.PushBack({ 174, 1375, 61, 52 });
+	pelipper.speed = 0.05f;
+
+	//Zigzagoon
+	zigzagoon.PushBack({ 274, 1684, 60, 46 });
+	zigzagoon.PushBack({ 336, 1684, 60, 46 });
+	zigzagoon.speed = 0.07f;
 
 	return ret;
 }
@@ -48,7 +115,62 @@ update_status ModuleSceneIntro::Update()
 	//Blit background
 	App->renderer->Blit(pinball, 0, 0, &background);
 
+	//Water
+	App->renderer->Blit(pinball, 253, 256, &(water.GetCurrentFrame()));
 
+	//Spoink
+	if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_DOWN)
+	{
+		App->renderer->Blit(pinball, 350, 550, &(downSpoink.GetCurrentFrame()));
+	}
+	else if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)
+	{
+		App->renderer->Blit(pinball, 348, 550, &(redSpoink.GetCurrentFrame()));
+	}
+	else
+	{
+		App->renderer->Blit(pinball, 350, 550, &(spoink.GetCurrentFrame()));
+	}
+
+	//Pikachu
+	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_DOWN)
+	{
+		pikachu_pos = 30;
+	}
+	else if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_DOWN)
+	{
+		pikachu_pos = 295;
+	}
+	App->renderer->Blit(pinball, pikachu_pos, 570, &(pikachu.GetCurrentFrame()));
+
+	//Mart
+	App->renderer->Blit(pinball, 32, 172, &(mart.GetCurrentFrame()));
+
+	//Shroomish
+	App->renderer->Blit(pinball, 122, 195, &(shroomish.GetCurrentFrame()));
+	App->renderer->Blit(pinball, 177, 190, &(shroomish.GetCurrentFrame()));
+	App->renderer->Blit(pinball, 150, 230, &(shroomish.GetCurrentFrame()));
+
+	//Wailmer
+	App->renderer->Blit(pinball, 260, 245, &(wailmer.GetCurrentFrame()));
+
+	//background 1 / 2
+	App->renderer->Blit(pinball, 0, 0, &background2);
+	App->renderer->Blit(pinball, 0, 0, &background1);
+	
+	//Zigzagoon
+	App->renderer->Blit(pinball, 300, 425, &(zigzagoon.GetCurrentFrame()));
+
+	//Pelipper
+	App->renderer->Blit(pinball, 223, 180, &(pelipper.GetCurrentFrame()));
+
+	//Plusle
+	App->renderer->Blit(pinball, 58, 248, &(plusle.GetCurrentFrame()));
+
+	//Minum
+	App->renderer->Blit(pinball, 107, 218, &(minum.GetCurrentFrame()));
+
+	
 	//if(App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
 	//{
 	//	ray_on = !ray_on;
