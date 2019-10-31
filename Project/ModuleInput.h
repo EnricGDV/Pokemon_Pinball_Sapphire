@@ -35,6 +35,11 @@ public:
 		return (id < MAX_MOUSE_BUTTONS) ? mouse_buttons[id] : KEY_ERROR;
 	}
 
+	KEY_STATE GetKey(int id) const
+	{
+		return keyboard[id];
+	}
+
 	int GetMouseX() const
 	{
 		return mouse_x;
