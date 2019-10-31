@@ -27,6 +27,7 @@ public:
 	SDL_Rect background;
 	SDL_Rect background1;
 	SDL_Rect background2;
+	SDL_Rect pikaStatic;
 
 	PhysBody* sensor;
 	bool sensed;
@@ -44,7 +45,19 @@ public:
 	Animation minum;
 	Animation plusle;
 	Animation zigzagoon;
+	Animation mart_minplus;
+	Animation mart_plusle;
+	Animation mart_minum;
+	Animation pikaCharge;
+	Animation pikaCharge2;
+	Animation pikaCharge3;
+	Animation pikaRoulette;
+	
+	bool martPlus;
+	bool martMin;
 
+	uint pikaLap;
+	uint pikaCount;
 	uint pikachu_pos;
 	uint bonus_fx;
 	p2Point<int> ray;
