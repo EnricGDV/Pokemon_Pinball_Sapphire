@@ -135,11 +135,12 @@ bool ModuleSceneIntro::Start()
 	pikaRoulette.PushBack({ 769, 1264, 28, 27 });
 	pikaRoulette.speed = 1.0f;
 
-	pikaCharge.PushBack({ 215, 1309, 54, 37 });
+	pikaCharge.PushBack({ 216, 1309, 54, 37 });
 	pikaCharge.PushBack({ 271, 1309, 54, 37 });
-	pikaCharge.PushBack({ 326, 1309, 54, 37 });
+	pikaCharge.PushBack({ 327, 1309, 54, 37 });
 	pikaCharge.PushBack({ 382, 1309, 54, 37 });
 	pikaCharge.speed = 0.09f;
+	pikaCharge.loop = false;
 
 	pikaCharge2.PushBack({ 438, 1309, 54, 37 });
 	pikaCharge2.PushBack({ 492, 1309, 54, 37 });
@@ -147,6 +148,7 @@ bool ModuleSceneIntro::Start()
 	pikaCharge2.PushBack({ 604, 1309, 54, 37 });
 	pikaCharge2.PushBack({ 660, 1309, 54, 37 });
 	pikaCharge2.speed = 0.09f;
+	pikaCharge2.loop = false;
 
 	pikaCharge3.PushBack({ 715, 1309, 54, 37 });
 	pikaCharge3.PushBack({ 771, 1309, 54, 37 });
@@ -159,6 +161,7 @@ bool ModuleSceneIntro::Start()
 	pikaCharge3.PushBack({ 937, 1309, 54, 37 });
 	pikaCharge3.PushBack({ 937, 1309, 54, 37 });
 	pikaCharge3.speed = 0.09f;
+	pikaCharge3.loop = false;
 
 	pikaStatic = { 349, 1264, 28, 27 };
 	pikaCount = 0;
