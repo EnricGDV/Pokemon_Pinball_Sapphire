@@ -19,9 +19,14 @@ public:
 	void OnCollision(PhysBody* bodyA, PhysBody* bodyB);
 
 public:
+	//bodies
 	p2List<PhysBody*> circles;
 	p2List<PhysBody*> boxes;
-	p2List<PhysBody*> ricks;
+	p2List<PhysBody*> walls;
+
+	//bumpers
+	PhysBody* bumper_l;
+	PhysBody* bumper_r;
 	
 	//sprite rectangles
 	SDL_Rect background;
@@ -29,9 +34,24 @@ public:
 	SDL_Rect background2;
 	SDL_Rect pikaStatic;
 
-	PhysBody* sensor;
-	bool sensed;
+	//sensors
+	PhysBody* sensorfall;
+	PhysBody* sensorminum;
+	PhysBody* sensorplusle;
+	PhysBody* sensormart;
+	PhysBody* sensorpikachu;
+	PhysBody* sensorwailmer;
+	PhysBody* sensorpelipper;
+	PhysBody* sensorentrance1;
+	PhysBody* sensorentrance2;
+	PhysBody* sensorzigzagoon;
 
+	//booleans
+	bool sensed;
+	bool lvl1 = false;
+	bool lvl2 = true;
+
+	//animations
 	SDL_Texture* pinball;
 	Animation water;
 	Animation spoink;

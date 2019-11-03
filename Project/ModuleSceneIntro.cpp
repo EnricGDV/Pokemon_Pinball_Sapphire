@@ -31,11 +31,297 @@ bool ModuleSceneIntro::Start()
 	App->audio->PlayMusic("music/Sapphire_field.ogg", -1);
 	bonus_fx = App->audio->LoadFx("audio/bonus.wav");
 
-	//sensor = App->physics->CreateRectangleSensor(SCREEN_WIDTH / 2, SCREEN_HEIGHT, SCREEN_WIDTH, 50);
+	//PHYSICS BODY CREATION//
+
+	//create static bodies
+	circles.add(App->physics->CreateCircle(198, 210, 10));
+	circles.getLast()->data->body->SetType(b2_staticBody);
+	circles.getLast()->data->listener = this;
+	circles.add(App->physics->CreateCircle(142, 215, 10));
+	circles.getLast()->data->body->SetType(b2_staticBody);
+	circles.getLast()->data->listener = this;
+	circles.add(App->physics->CreateCircle(170, 250, 10));
+	circles.getLast()->data->body->SetType(b2_staticBody);
+	circles.getLast()->data->listener = this;
+	circles.add(App->physics->CreateCircle(105, 292, 10));
+	circles.getLast()->data->body->SetType(b2_staticBody);
+	boxes.add(App->physics->CreateRectangle(365, 580, 25, 15));
+	boxes.getLast()->data->body->SetType(b2_staticBody);
+	boxes.add(App->physics->CreateRectangle(48, 588, 25, 35));
+	boxes.getLast()->data->body->SetType(b2_staticBody);
+
+	bumper_l = App->physics->CreateTriangle({ 0, 0 }, { -29, 46 }, { 2, 31 }, { 258, 509 });
+	bumper_l->body->SetType(b2_staticBody);
+	bumper_r = App->physics->CreateTriangle({ 0, 0 }, { 0, 34 }, { 29, 47 }, { 100, 509 });
+	bumper_r->body->SetType(b2_staticBody);
+
+	//create sensors
+	sensorfall = App->physics->CreateRectangleSensor(180,  SCREEN_HEIGHT+10, 64, 20);
+	sensorminum = App->physics->CreateRectangleSensor(135, 292, 10, 10);
+	sensorplusle = App->physics->CreateRectangleSensor(87, 320, 10, 10);
+	sensormart = App->physics->CreateRectangleSensor(93, 270, 10, 10);
+	sensorpikachu = App->physics->CreateRectangleSensor(328, 255, 10, 10);
+	sensorwailmer = App->physics->CreateRectangleSensor(288, 273, 10, 10);
+	sensorpelipper = App->physics->CreateRectangleSensor(233, 270, 10, 10);
+	sensorentrance2 = App->physics->CreateRectangleSensor(65, 335, 10, 10);
+	sensorentrance1 = App->physics->CreateRectangleSensor(280, 340, 10, 10);
+
 	background = { 803, 6, SCREEN_WIDTH, SCREEN_HEIGHT };
 	background1 = { 18, 6, SCREEN_WIDTH, 344 };
 	background2 = { 410, 6, SCREEN_WIDTH, 576 };
 
+	//create chains
+	int wall_main[84] = {
+			212, 647,
+			212, 640,
+			324, 577,
+			324, 510,
+			324, 497,
+			317, 487,
+			306, 484,
+			296, 483,
+			288, 476,
+			288, 440,
+			309, 416,
+			329, 377,
+			338, 344,
+			342, 311,
+			340, 250,
+			331, 211,
+			314, 172,
+			285, 143,
+			246, 121,
+			202, 110,
+			155, 110,
+			107, 123,
+			66, 150,
+			40, 183,
+			25, 218,
+			15, 260,
+			14, 296,
+			18, 343,
+			28, 375,
+			46, 409,
+			56, 424,
+			70, 441,
+			70, 474,
+			63, 482,
+			52, 482,
+			42, 485,
+			36, 494,
+			34, 508,
+			34, 578,
+			150, 641,
+			148, 664,
+			212, 664
+	};
+
+	int wall_left[20] = {
+	137, 596,
+	129, 604,
+	68, 566,
+	65, 562,
+	65, 511,
+	68, 507,
+	73, 507,
+	73, 549,
+	77, 557,
+	135, 594
+	};
+
+	int wall_right[20] = {
+	231, 606,
+	222, 598,
+	280, 560,
+	286, 553,
+	286, 512,
+	289, 508,
+	294, 509,
+	294, 562,
+	288, 569,
+	232, 606
+	};
+
+	int mart_wall[40] = {
+	96, 313,
+	80, 322,
+	58, 286,
+	49, 261,
+	50, 245,
+	61, 218,
+	76, 196,
+	100, 173,
+	119, 160,
+	120, 180,
+	107, 192,
+	106, 208,
+	122, 245,
+	143, 285,
+	128, 293,
+	108, 264,
+	96, 260,
+	83, 264,
+	81, 276,
+	94, 306
+	};
+
+	int island[86] = {
+	245, 323,
+	239, 329,
+	232, 326,
+	230, 314,
+	232, 301,
+	243, 294,
+	243, 272,
+	226, 263,
+	215, 273,
+	212, 268,
+	216, 251,
+	239, 227,
+	248, 214,
+	251, 199,
+	239, 181,
+	225, 177,
+	211, 175,
+	205, 172,
+	205, 161,
+	211, 150,
+	250, 161,
+	272, 178,
+	283, 193,
+	292, 210,
+	301, 229,
+	311, 249,
+	314, 267,
+	316, 284,
+	316, 306,
+	316, 316,
+	308, 325,
+	282, 327,
+	276, 318,
+	297, 291,
+	307, 282,
+	308, 267,
+	293, 256,
+	279, 258,
+	265, 270,
+	260, 280,
+	257, 293,
+	250, 306,
+	247, 316
+	};
+
+	int mini_wall1[8] = {
+	153, 180,
+	143, 180,
+	143, 153,
+	153, 153
+	};
+
+	int mini_wall2[8] = {
+	184, 178,
+	174, 178,
+	174, 149,
+	184, 149
+	};
+
+	int entrance1[36] = {
+	285, 367,
+	294, 344,
+	312, 315,
+	315, 310,
+	313, 284,
+	288, 308,
+	277, 327,
+	271, 336,
+	267, 345,
+	265, 342,
+	281, 312,
+	311, 282,
+	317, 277,
+	318, 297,
+	320, 310,
+	305, 331,
+	296, 348,
+	297, 357
+	};
+
+	int entrance2[20] = {
+	49, 334,
+	66, 365,
+	64, 367,
+	53, 357,
+	54, 348,
+	44, 330,
+	69, 314,
+	84, 340,
+	82, 341,
+	71, 321
+	};
+
+	int lvl2[94] = {
+	82, 340,
+	71, 322,
+	58, 294,
+	47, 261,
+	43, 240,
+	40, 204,
+	48, 164,
+	60, 137,
+	94, 107,
+	132, 92,
+	171, 93,
+	206, 112,
+	218, 135,
+	224, 162,
+	222, 175,
+	246, 177,
+	246, 146,
+	240, 120,
+	227, 102,
+	202, 82,
+	188, 75,
+	219, 68,
+	251, 64,
+	293, 64,
+	330, 70,
+	348, 86,
+	353, 108,
+	352, 624,
+	375, 624,
+	375, 108,
+	374, 79,
+	363, 54,
+	338, 40,
+	295, 37,
+	255, 37,
+	215, 41,
+	166, 51,
+	126, 68,
+	90, 81,
+	54, 108,
+	38, 129,
+	24, 155,
+	18, 202,
+	18, 244,
+	30, 293,
+	44, 328,
+	62, 363
+	};
+
+	walls.add(App->physics->CreateChain(0, 0, wall_main, 84));
+	walls.add(App->physics->CreateChain(0, 0, wall_left, 20));
+	walls.add(App->physics->CreateChain(0, 0, wall_right, 20));
+	walls.add(App->physics->CreateChain(0, 0, mart_wall, 40));
+	walls.add(App->physics->CreateChain(0, 0, island, 86));
+	walls.add(App->physics->CreateChain(0, 0, mini_wall1, 8));
+	walls.add(App->physics->CreateChain(0, 0, mini_wall2, 8));
+	walls.add(App->physics->CreateChain(0, 0, entrance1, 36));
+	walls.add(App->physics->CreateChain(0, 0, entrance2, 20));
+	//walls.add(App->physics->CreateChain(0, 0, lvl2, 94));
+
+	//SPRITE COORDINATES//
+	
 	//water
 	water.PushBack({ 1010, 731, 57, 63 });
 	water.PushBack({ 1070, 731, 57, 63 });
@@ -166,7 +452,7 @@ bool ModuleSceneIntro::Start()
 	pikaStatic = { 349, 1264, 28, 27 };
 	pikaCount = 0;
 	pikaLap = 0;
-
+	
 	return ret;
 }
 
@@ -205,10 +491,12 @@ update_status ModuleSceneIntro::Update()
 	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_DOWN)
 	{
 		pikachu_pos = 30;
+		boxes.getLast()->data->body->SetTransform({ PIXEL_TO_METERS(48), PIXEL_TO_METERS(588) }, boxes.getLast()->data->body->GetAngle());
 	}
 	else if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_DOWN)
 	{
 		pikachu_pos = 295;
+		boxes.getLast()->data->body->SetTransform({ PIXEL_TO_METERS(313), PIXEL_TO_METERS(588) }, boxes.getLast()->data->body->GetAngle());
 	}
 	App->renderer->Blit(pinball, pikachu_pos, 570, &(pikachu.GetCurrentFrame()));
 
@@ -339,51 +627,15 @@ update_status ModuleSceneIntro::Update()
 	//	circles.getLast()->data->listener = this;
 	//}
 
-	//if(App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
-	//{
-	//	boxes.add(App->physics->CreateRectangle(App->input->GetMouseX(), App->input->GetMouseY(), 100, 50));
-	//}
+	if(App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
+	{
+		boxes.add(App->physics->CreateRectangle(App->input->GetMouseX(), App->input->GetMouseY(), 100, 50));
+	}
 
-	//if(App->input->GetKey(SDL_SCANCODE_3) == KEY_DOWN)
-	//{
-	//	// Pivot 0, 0
-	//	int rick_head[64] = {
-	//		14, 36,
-	//		42, 40,
-	//		40, 0,
-	//		75, 30,
-	//		88, 4,
-	//		94, 39,
-	//		111, 36,
-	//		104, 58,
-	//		107, 62,
-	//		117, 67,
-	//		109, 73,
-	//		110, 85,
-	//		106, 91,
-	//		109, 99,
-	//		103, 104,
-	//		100, 115,
-	//		106, 121,
-	//		103, 125,
-	//		98, 126,
-	//		95, 137,
-	//		83, 147,
-	//		67, 147,
-	//		53, 140,
-	//		46, 132,
-	//		34, 136,
-	//		38, 126,
-	//		23, 123,
-	//		30, 114,
-	//		10, 102,
-	//		29, 90,
-	//		0, 75,
-	//		30, 62
-	//	};
-
-	//	ricks.add(App->physics->CreateChain(App->input->GetMouseX(), App->input->GetMouseY(), rick_head, 64));
-	//}
+	
+		// Pivot 0, 0
+	
+	
 
 	// Prepare for raycast ------------------------------------------------------
 	
@@ -395,6 +647,12 @@ update_status ModuleSceneIntro::Update()
 	fVector normal(0.0f, 0.0f);
 
 	// All draw functions ------------------------------------------------------
+
+	//draw ball
+	int x, y;
+	circles.getLast()->data->GetPosition(x, y);
+	//App->renderer->Blit(pinball, x, y, NULL, 1.0f, circles.getLast()->data->GetRotation());
+
 	p2List_item<PhysBody*>* c = circles.getFirst();
 
 	/*while(c != NULL)
@@ -408,9 +666,9 @@ update_status ModuleSceneIntro::Update()
 
 	c = boxes.getFirst();
 
-	while(c != NULL)
+	/*while(c != NULL)
 	{
-		/*int x, y;
+		int x, y;
 		c->data->GetPosition(x, y);
 		App->renderer->Blit(box, x, y, NULL, 1.0f, c->data->GetRotation());
 		if(ray_on)
@@ -419,10 +677,10 @@ update_status ModuleSceneIntro::Update()
 			if(hit >= 0)
 				ray_hit = hit;
 		}
-		c = c->next;*/
-	}
+		c = c->next;
+	}*/
 
-	c = ricks.getFirst();
+	c = walls.getFirst();
 
 	/*while(c != NULL)
 	{
