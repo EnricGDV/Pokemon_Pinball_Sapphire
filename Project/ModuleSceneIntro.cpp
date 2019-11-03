@@ -39,14 +39,14 @@ bool ModuleSceneIntro::Start()
 
 	//create flippers
 	
-	boxes.add(App->physics->CreateRectangle(134, 600, 35, 10));
+	boxes.add(App->physics->CreateRectangle(134, 600, 36, 10));
 	boxes.getLast()->data->listener = this;
 	circles.add(App->physics->CreateCircle(133, 600, 2));
 	circles.getLast()->data->body->SetType(b2_staticBody);
 
-	boxes.add(App->physics->CreateRectangle(192, 600, 35, 10));
+	boxes.add(App->physics->CreateRectangle(186, 600, 36, 10));
 	boxes.getLast()->data->listener = this;
-	circles.add(App->physics->CreateCircle(228, 600, 2));
+	circles.add(App->physics->CreateCircle(226, 602, 2));
 	circles.getLast()->data->body->SetType(b2_staticBody);
 
 	//create all bodies
@@ -92,7 +92,7 @@ bool ModuleSceneIntro::Start()
 	b2RevoluteJointDef revJoint_l;
 	revJoint_l.bodyA = boxes.getFirst()->data->body;
 	revJoint_l.bodyB = circles.getFirst()->next->data->body;
-	revJoint_l.localAnchorA.Set(PIXEL_TO_METERS(-22), PIXEL_TO_METERS(0));
+	revJoint_l.localAnchorA.Set(PIXEL_TO_METERS(-18), PIXEL_TO_METERS(0));
 	revJoint_l.localAnchorB.Set(0, 0);
 	revJoint_l.lowerAngle = DEGTORAD*(-30);
 	revJoint_l.referenceAngle = 0;
@@ -103,11 +103,11 @@ bool ModuleSceneIntro::Start()
 	b2RevoluteJointDef revJoint_r;
 	revJoint_r.bodyA = boxes.getFirst()->next->data->body;
 	revJoint_r.bodyB = circles.getFirst()->next->next->data->body;
-	revJoint_r.localAnchorA.Set(PIXEL_TO_METERS(22), PIXEL_TO_METERS(-2));
+	revJoint_r.localAnchorA.Set(PIXEL_TO_METERS(18), PIXEL_TO_METERS(0));
 	revJoint_r.localAnchorB.Set(0, 0);
-	revJoint_r.lowerAngle = DEGTORAD * 30;
+	revJoint_r.lowerAngle = DEGTORAD * (-30);
 	revJoint_r.referenceAngle = 0;
-	revJoint_r.upperAngle = DEGTORAD * (-30);
+	revJoint_r.upperAngle = DEGTORAD * (30);
 	revJoint_r.enableLimit = true;
 	b2RevoluteJoint* joint_r = (b2RevoluteJoint*)boxes.getFirst()->next->data->body->GetWorld()->CreateJoint(&revJoint_r);
 
@@ -284,6 +284,16 @@ update_status ModuleSceneIntro::Update()
 	else
 	{
 		App->renderer->Blit(pinball, 350, 550, &(spoink.GetCurrentFrame()));
+	}
+
+	//Flippers
+	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_REPEAT)
+	{
+		boxes.getFirst()->data->body->ApplyForceToCenter(b2Vec2(0, -200), 1);
+	}
+	if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_REPEAT)
+	{
+		boxes.getFirst()->next->data->body->ApplyForceToCenter(b2Vec2(0, -200), 1);
 	}
 
 	//Pikachu
@@ -564,7 +574,7 @@ update_status ModuleSceneIntro::Update()
 
 void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
-	if ( bodyB == sensorentrance1 || bodyB == sensorentrance2 || bodyB == sensorentrance3)
+	if ( bodyB == sensorentrance1 || bodyB == sensorentrance2 ||(bodyB->body->GetLinearVelocity().y < 0 && bodyB == sensorentrance3))
 	{
 		changelvl = true;
 	}
