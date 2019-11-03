@@ -167,7 +167,7 @@ bool ModuleSceneIntro::Start()
 
 	shroomishHit.PushBack({ 178, 1458, 41, 47 });
 	shroomishHit.PushBack({ 222, 1458, 41, 47 });
-	shroomishHit.speed = 0.8f;
+	shroomishHit.speed = 0.05f;
 	shroomishHit.loop = false;
 
 	//Pluse
