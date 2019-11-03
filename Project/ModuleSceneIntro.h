@@ -77,6 +77,8 @@ public:
 	bool martPlus;
 	bool martMin;
 
+	bool srmshHit = false;
+
 	bool pika = false;
 	bool pikaburst = false;
 
@@ -99,6 +101,7 @@ public:
 	Animation pikachu;
 	Animation mart;
 	Animation shroomish;
+	Animation shroomishHit;
 	Animation wailmer;
 	Animation pelipper;
 	Animation minum;
