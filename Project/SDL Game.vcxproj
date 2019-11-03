@@ -14,7 +14,7 @@
     <ProjectGuid>{746CC4C3-787F-4B0E-AA66-E388FE3FF4F6}</ProjectGuid>
     <RootNamespace>SDLGame</RootNamespace>
     <ProjectName>2D Physics - class 4</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -47,13 +47,13 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>C:\Users\alex_\OneDrive\Documentos\GitHub\Pokemon_Pinball_Sapphire\Project\Box2D\Box2D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Documentos\GitHub\Pokemon_Pinball_Sapphire\Project\Box2D\Box2D;C:\Users\alex_\OneDrive\Documentos\GitHub\Pokemon_Pinball_Sapphire\Project\Box2D\Box2D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>Box2D.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\alex_\OneDrive\Documentos\GitHub\Pokemon_Pinball_Sapphire\Project\Box2D\libx86\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\Documentos\GitHub\Pokemon_Pinball_Sapphire\Project\Box2D\libx86\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -64,7 +64,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ExceptionHandling>false</ExceptionHandling>
-      <AdditionalIncludeDirectories>C:\Users\alex_\OneDrive\Documentos\GitHub\Pokemon_Pinball_Sapphire\Project\Box2D\Box2D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Documentos\GitHub\Pokemon_Pinball_Sapphire\Project\Box2D\Box2D;C:\Users\alex_\OneDrive\Documentos\GitHub\Pokemon_Pinball_Sapphire\Project\Box2D\Box2D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -72,7 +72,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Windows</SubSystem>
       <AdditionalDependencies>Box2D.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\alex_\OneDrive\Documentos\GitHub\Pokemon_Pinball_Sapphire\Project\Box2D\libx86\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>E:\Documentos\GitHub\Pokemon_Pinball_Sapphire\Project\Box2D\libx86\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

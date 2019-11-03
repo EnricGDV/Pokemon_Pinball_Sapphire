@@ -39,12 +39,12 @@ bool ModuleSceneIntro::Start()
 
 	//create flippers
 	
-	boxes.add(App->physics->CreateRectangle(134, 600, 36, 10));
+	boxes.add(App->physics->CreateRectangle(134, 600, 38, 10));
 	boxes.getLast()->data->listener = this;
 	circles.add(App->physics->CreateCircle(133, 600, 2));
 	circles.getLast()->data->body->SetType(b2_staticBody);
 
-	boxes.add(App->physics->CreateRectangle(186, 600, 36, 10));
+	boxes.add(App->physics->CreateRectangle(186, 600, 38, 10));
 	boxes.getLast()->data->listener = this;
 	circles.add(App->physics->CreateCircle(226, 602, 2));
 	circles.getLast()->data->body->SetType(b2_staticBody);
@@ -117,8 +117,8 @@ bool ModuleSceneIntro::Start()
 	background = { 803, 6, SCREEN_WIDTH, SCREEN_HEIGHT };
 	background1 = { 18, 6, SCREEN_WIDTH, 344 };
 	background2 = { 410, 6, SCREEN_WIDTH, 576 };
-	flipper_l = { 10, 762, 44, 32 };
-	flipper_r = { 10, 799, 44, 32 };
+	flipper_l = { 154, 762, 47, 18 };
+	flipper_r = { 154, 785, 47, 18 };
 	
 
 	//water
@@ -309,14 +309,21 @@ update_status ModuleSceneIntro::Update()
 	}
 	App->renderer->Blit(pinball, pikachu_pos, 570, &(pikachu.GetCurrentFrame()));
 
-	//Ball 
-	p2List_item<PhysBody*>* pokeball = circles.getFirst();
+	//Draw Ball 
+	PhysBody* pokeball = circles.getFirst()->data;
 	int x, y;
-	pokeball->data->GetPosition(x, y);
-	App->renderer->Blit(pinball, x, y, &ball, 1.0f, pokeball->data->GetRotation());
+	pokeball->GetPosition(x, y);
+	App->renderer->Blit(pinball, x, y, &ball, 1.0f, pokeball->GetRotation());
 
-	
-	
+	//Draw Flippers
+	PhysBody* flipperl = boxes.getFirst()->data;
+	flipperl->GetPosition(x, y);
+	App->renderer->Blit(pinball, x - 10, y - 2, &flipper_l, 1.0f, (flipperl->GetRotation()));
+	PhysBody* flipperr = boxes.getFirst()->next->data;
+	flipperr->GetPosition(x, y);
+	App->renderer->Blit(pinball, x + 5 , y - 2, &flipper_r, 1.0f, (flipperr->GetRotation()));
+
+
 	//Mart
 	App->renderer->Blit(pinball, 32, 172, &(mart.GetCurrentFrame()));
 
