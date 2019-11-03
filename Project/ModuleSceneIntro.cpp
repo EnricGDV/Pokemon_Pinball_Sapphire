@@ -123,6 +123,9 @@ bool ModuleSceneIntro::Start()
 	background2 = { 410, 6, SCREEN_WIDTH, 576 };
 	flipper_l = { 154, 762, 47, 18 };
 	flipper_r = { 154, 785, 47, 18 };
+	lifeball = { 263, 1266, 23, 22 };
+	nest1 = { 561, 1467, 43, 12 };
+	nest2 = { 561, 1481, 43, 23 };
 	
 
 	//water
@@ -255,6 +258,7 @@ bool ModuleSceneIntro::Start()
 	pikaStatic = { 349, 1264, 28, 27 };
 	pikaCount = 0;
 	pikaLap = 0;
+
 	
 	return ret;
 }
@@ -378,6 +382,10 @@ update_status ModuleSceneIntro::Update()
 	
 	//Zigzagoon
 	App->renderer->Blit(pinball, 300, 425, &(zigzagoon.GetCurrentFrame()));
+
+	//Nest
+	App->renderer->Blit(pinball, 15, 440, &nest1);
+	App->renderer->Blit(pinball, 15, 445, &nest2);
 
 	//Pelipper
 	App->renderer->Blit(pinball, 223, 180, &(pelipper.GetCurrentFrame()));
@@ -537,6 +545,7 @@ update_status ModuleSceneIntro::Update()
 	//UI
 	App->fonts->BlitText(5, SCREEN_HEIGHT - 30, font, std::to_string(score).c_str());
 	App->fonts->BlitText(SCREEN_WIDTH - 20, SCREEN_HEIGHT - 30, font, std::to_string(balls).c_str());
+	App->renderer->Blit(pinball, 335, 620, &lifeball);
 
 	// Prepare for raycast ------------------------------------------------------
 	

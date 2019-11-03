@@ -39,6 +39,9 @@ public:
 	SDL_Rect background1;
 	SDL_Rect background2;
 	SDL_Rect pikaStatic;
+	SDL_Rect lifeball;
+	SDL_Rect nest1;
+	SDL_Rect nest2;
 
 	//font
 	int font;
