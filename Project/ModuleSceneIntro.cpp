@@ -33,7 +33,23 @@ bool ModuleSceneIntro::Start()
 
 	//PHYSICS BODY CREATION//
 
-	//create static bodies
+	//create ball
+	circles.add(App->physics->CreateCircle(initPosition.x, initPosition.y, 11));
+	circles.getLast()->data->listener = this;
+
+	//create flippers
+	
+	boxes.add(App->physics->CreateRectangle(134, 600, 35, 10));
+	boxes.getLast()->data->listener = this;
+	circles.add(App->physics->CreateCircle(133, 600, 2));
+	circles.getLast()->data->body->SetType(b2_staticBody);
+
+	boxes.add(App->physics->CreateRectangle(192, 600, 35, 10));
+	boxes.getLast()->data->listener = this;
+	circles.add(App->physics->CreateCircle(228, 600, 2));
+	circles.getLast()->data->body->SetType(b2_staticBody);
+
+	//create all bodies
 	circles.add(App->physics->CreateCircle(198, 210, 10));
 	circles.getLast()->data->body->SetType(b2_staticBody);
 	circles.getLast()->data->listener = this;
@@ -45,10 +61,14 @@ bool ModuleSceneIntro::Start()
 	circles.getLast()->data->listener = this;
 	circles.add(App->physics->CreateCircle(105, 292, 10));
 	circles.getLast()->data->body->SetType(b2_staticBody);
-	boxes.add(App->physics->CreateRectangle(365, 580, 25, 15));
-	boxes.getLast()->data->body->SetType(b2_staticBody);
+	boxes.add(App->physics->CreateRectangle(365, 570, 25, 15));
+	boxes.getLast()->data->body->SetType(b2_kinematicBody);
 	boxes.add(App->physics->CreateRectangle(48, 588, 25, 35));
 	boxes.getLast()->data->body->SetType(b2_staticBody);
+	walls.add(App->physics->CreateChain(0, 0, wall_left, 20));
+	walls.add(App->physics->CreateChain(0, 0, wall_right, 20));
+	walls.add(App->physics->CreateChain(0, 0, level2, 96));
+	
 
 	bumper_l = App->physics->CreateTriangle({ 0, 0 }, { -29, 46 }, { 2, 31 }, { 258, 509 });
 	bumper_l->body->SetType(b2_staticBody);
@@ -65,263 +85,42 @@ bool ModuleSceneIntro::Start()
 	sensorpelipper = App->physics->CreateRectangleSensor(233, 270, 10, 10);
 	sensorentrance2 = App->physics->CreateRectangleSensor(65, 335, 10, 10);
 	sensorentrance1 = App->physics->CreateRectangleSensor(280, 340, 10, 10);
+	sensorentrance3 = App->physics->CreateRectangleSensor(230, 205, 10, 10);
+	sensorlights = App->physics->CreateRectangleSensor(362, 165, 10, 10);
 
+	//create joints
+	b2RevoluteJointDef revJoint_l;
+	revJoint_l.bodyA = boxes.getFirst()->data->body;
+	revJoint_l.bodyB = circles.getFirst()->next->data->body;
+	revJoint_l.localAnchorA.Set(PIXEL_TO_METERS(-22), PIXEL_TO_METERS(0));
+	revJoint_l.localAnchorB.Set(0, 0);
+	revJoint_l.lowerAngle = DEGTORAD*(-30);
+	revJoint_l.referenceAngle = 0;
+	revJoint_l.upperAngle = DEGTORAD*30;
+	revJoint_l.enableLimit = true;
+	b2RevoluteJoint* joint_l = (b2RevoluteJoint*)boxes.getFirst()->data->body->GetWorld()->CreateJoint(&revJoint_l);
+
+	b2RevoluteJointDef revJoint_r;
+	revJoint_r.bodyA = boxes.getFirst()->next->data->body;
+	revJoint_r.bodyB = circles.getFirst()->next->next->data->body;
+	revJoint_r.localAnchorA.Set(PIXEL_TO_METERS(22), PIXEL_TO_METERS(-2));
+	revJoint_r.localAnchorB.Set(0, 0);
+	revJoint_r.lowerAngle = DEGTORAD * 30;
+	revJoint_r.referenceAngle = 0;
+	revJoint_r.upperAngle = DEGTORAD * (-30);
+	revJoint_r.enableLimit = true;
+	b2RevoluteJoint* joint_r = (b2RevoluteJoint*)boxes.getFirst()->next->data->body->GetWorld()->CreateJoint(&revJoint_r);
+
+	//SPRITE COORDINATES//
+
+	ball = { 8, 1689, 22, 22 };
 	background = { 803, 6, SCREEN_WIDTH, SCREEN_HEIGHT };
 	background1 = { 18, 6, SCREEN_WIDTH, 344 };
 	background2 = { 410, 6, SCREEN_WIDTH, 576 };
-
-	//create chains
-	int wall_main[84] = {
-			212, 647,
-			212, 640,
-			324, 577,
-			324, 510,
-			324, 497,
-			317, 487,
-			306, 484,
-			296, 483,
-			288, 476,
-			288, 440,
-			309, 416,
-			329, 377,
-			338, 344,
-			342, 311,
-			340, 250,
-			331, 211,
-			314, 172,
-			285, 143,
-			246, 121,
-			202, 110,
-			155, 110,
-			107, 123,
-			66, 150,
-			40, 183,
-			25, 218,
-			15, 260,
-			14, 296,
-			18, 343,
-			28, 375,
-			46, 409,
-			56, 424,
-			70, 441,
-			70, 474,
-			63, 482,
-			52, 482,
-			42, 485,
-			36, 494,
-			34, 508,
-			34, 578,
-			150, 641,
-			148, 664,
-			212, 664
-	};
-
-	int wall_left[20] = {
-	137, 596,
-	129, 604,
-	68, 566,
-	65, 562,
-	65, 511,
-	68, 507,
-	73, 507,
-	73, 549,
-	77, 557,
-	135, 594
-	};
-
-	int wall_right[20] = {
-	231, 606,
-	222, 598,
-	280, 560,
-	286, 553,
-	286, 512,
-	289, 508,
-	294, 509,
-	294, 562,
-	288, 569,
-	232, 606
-	};
-
-	int mart_wall[40] = {
-	96, 313,
-	80, 322,
-	58, 286,
-	49, 261,
-	50, 245,
-	61, 218,
-	76, 196,
-	100, 173,
-	119, 160,
-	120, 180,
-	107, 192,
-	106, 208,
-	122, 245,
-	143, 285,
-	128, 293,
-	108, 264,
-	96, 260,
-	83, 264,
-	81, 276,
-	94, 306
-	};
-
-	int island[86] = {
-	245, 323,
-	239, 329,
-	232, 326,
-	230, 314,
-	232, 301,
-	243, 294,
-	243, 272,
-	226, 263,
-	215, 273,
-	212, 268,
-	216, 251,
-	239, 227,
-	248, 214,
-	251, 199,
-	239, 181,
-	225, 177,
-	211, 175,
-	205, 172,
-	205, 161,
-	211, 150,
-	250, 161,
-	272, 178,
-	283, 193,
-	292, 210,
-	301, 229,
-	311, 249,
-	314, 267,
-	316, 284,
-	316, 306,
-	316, 316,
-	308, 325,
-	282, 327,
-	276, 318,
-	297, 291,
-	307, 282,
-	308, 267,
-	293, 256,
-	279, 258,
-	265, 270,
-	260, 280,
-	257, 293,
-	250, 306,
-	247, 316
-	};
-
-	int mini_wall1[8] = {
-	153, 180,
-	143, 180,
-	143, 153,
-	153, 153
-	};
-
-	int mini_wall2[8] = {
-	184, 178,
-	174, 178,
-	174, 149,
-	184, 149
-	};
-
-	int entrance1[36] = {
-	285, 367,
-	294, 344,
-	312, 315,
-	315, 310,
-	313, 284,
-	288, 308,
-	277, 327,
-	271, 336,
-	267, 345,
-	265, 342,
-	281, 312,
-	311, 282,
-	317, 277,
-	318, 297,
-	320, 310,
-	305, 331,
-	296, 348,
-	297, 357
-	};
-
-	int entrance2[20] = {
-	49, 334,
-	66, 365,
-	64, 367,
-	53, 357,
-	54, 348,
-	44, 330,
-	69, 314,
-	84, 340,
-	82, 341,
-	71, 321
-	};
-
-	int lvl2[94] = {
-	82, 340,
-	71, 322,
-	58, 294,
-	47, 261,
-	43, 240,
-	40, 204,
-	48, 164,
-	60, 137,
-	94, 107,
-	132, 92,
-	171, 93,
-	206, 112,
-	218, 135,
-	224, 162,
-	222, 175,
-	246, 177,
-	246, 146,
-	240, 120,
-	227, 102,
-	202, 82,
-	188, 75,
-	219, 68,
-	251, 64,
-	293, 64,
-	330, 70,
-	348, 86,
-	353, 108,
-	352, 624,
-	375, 624,
-	375, 108,
-	374, 79,
-	363, 54,
-	338, 40,
-	295, 37,
-	255, 37,
-	215, 41,
-	166, 51,
-	126, 68,
-	90, 81,
-	54, 108,
-	38, 129,
-	24, 155,
-	18, 202,
-	18, 244,
-	30, 293,
-	44, 328,
-	62, 363
-	};
-
-	walls.add(App->physics->CreateChain(0, 0, wall_main, 84));
-	walls.add(App->physics->CreateChain(0, 0, wall_left, 20));
-	walls.add(App->physics->CreateChain(0, 0, wall_right, 20));
-	walls.add(App->physics->CreateChain(0, 0, mart_wall, 40));
-	walls.add(App->physics->CreateChain(0, 0, island, 86));
-	walls.add(App->physics->CreateChain(0, 0, mini_wall1, 8));
-	walls.add(App->physics->CreateChain(0, 0, mini_wall2, 8));
-	walls.add(App->physics->CreateChain(0, 0, entrance1, 36));
-	walls.add(App->physics->CreateChain(0, 0, entrance2, 20));
-	//walls.add(App->physics->CreateChain(0, 0, lvl2, 94));
-
-	//SPRITE COORDINATES//
+	flipper_l = { 10, 762, 44, 32 };
+	flipper_r = { 10, 799, 44, 32 };
 	
+
 	//water
 	water.PushBack({ 1010, 731, 57, 63 });
 	water.PushBack({ 1070, 731, 57, 63 });
@@ -500,6 +299,14 @@ update_status ModuleSceneIntro::Update()
 	}
 	App->renderer->Blit(pinball, pikachu_pos, 570, &(pikachu.GetCurrentFrame()));
 
+	//Ball 
+	p2List_item<PhysBody*>* pokeball = circles.getFirst();
+	int x, y;
+	pokeball->data->GetPosition(x, y);
+	App->renderer->Blit(pinball, x, y, &ball, 1.0f, pokeball->data->GetRotation());
+
+	
+	
 	//Mart
 	App->renderer->Blit(pinball, 32, 172, &(mart.GetCurrentFrame()));
 
@@ -597,6 +404,37 @@ update_status ModuleSceneIntro::Update()
 		}
 	}
 
+	if ((martMin || martPlus) && circles.count() == 3)
+	{
+		circles.add(App->physics->CreateCircle(105, 292, 10));
+		circles.getLast()->data->body->SetType(b2_staticBody);
+	}
+	else if (!martMin && !martPlus && circles.count() == 4)
+	{
+		circles.getLast()->data->body->GetWorld()->DestroyBody(circles.getLast()->data->body);
+		circles.del(circles.getLast());
+	}
+
+	//Spoink
+
+	if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_DOWN)
+	{
+		boxes.getLast()->prev->data->body->SetLinearVelocity(b2Vec2(0, 1));
+	}
+	else if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_UP)
+	{
+		boxes.getLast()->prev->data->body->SetLinearVelocity(b2Vec2(0, -20));
+	}
+	else if (boxes.getLast()->prev->data->body->GetPosition().y > PIXEL_TO_METERS(590) || boxes.getLast()->prev->data->body->GetPosition().y < PIXEL_TO_METERS(570))
+	{
+		if (boxes.getLast()->prev->data->body->GetPosition().y < PIXEL_TO_METERS(570))
+		{
+			boxes.getLast()->prev->data->body->SetTransform({ boxes.getLast()->prev->data->body->GetPosition().x, PIXEL_TO_METERS(570) }, boxes.getLast()->prev->data->body->GetAngle());
+		}
+		
+		boxes.getLast()->prev->data->body->SetLinearVelocity(b2Vec2(0, 0));
+	}
+
 	//PikaCharge Panel
 
 	if (pikaCount == 1 && !pikaCharge.Finished())
@@ -612,7 +450,46 @@ update_status ModuleSceneIntro::Update()
 		App->renderer->Blit(pinball, 152, 325, &(pikaCharge3.GetCurrentFrame()));
 	}
 
-	
+	//Set ball to initial position
+	if (goInit)
+	{
+		circles.getFirst()->data->body->SetTransform({ PIXEL_TO_METERS(initPosition.x), PIXEL_TO_METERS(initPosition.y) }, circles.getFirst()->data->body->GetAngle());
+		goInit = false;
+		changelvl = true;
+	}
+
+	//Change levels
+	if (changelvl || App->input->GetKey(SDL_SCANCODE_F2) == KEY_DOWN)
+	{
+		if (lvl2)
+		{
+			walls.getLast()->data->body->GetWorld()->DestroyBody(walls.getLast()->data->body);
+			walls.del(walls.getLast());
+			walls.add(App->physics->CreateChain(0, 0, wall_main, 84));
+			walls.add(App->physics->CreateChain(0, 0, mart_wall, 40));
+			walls.add(App->physics->CreateChain(0, 0, island, 86));
+			walls.add(App->physics->CreateChain(0, 0, mini_wall1, 8));
+			walls.add(App->physics->CreateChain(0, 0, mini_wall2, 8));
+			walls.add(App->physics->CreateChain(0, 0, entrance1, 36));
+			walls.add(App->physics->CreateChain(0, 0, entrance2, 20));
+			lvl2 = false;
+			lvl1 = true;
+		}
+		else if (lvl1)
+		{
+			int num = walls.count();
+			for (int i = 0; i < num-2; i++)
+			{
+				walls.getLast()->data->body->GetWorld()->DestroyBody(walls.getLast()->data->body);
+				walls.del(walls.getLast());
+			}
+			walls.add(App->physics->CreateChain(0, 0, level2, 96));
+			lvl2 = true;
+			lvl1 = false;
+		}
+		changelvl = false;
+		
+	}
 	
 	//if(App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
 	//{
@@ -620,21 +497,6 @@ update_status ModuleSceneIntro::Update()
 	//	ray.x = App->input->GetMouseX();
 	//	ray.y = App->input->GetMouseY();
 	//}
-
-	//if(App->input->GetKey(SDL_SCANCODE_1) == KEY_DOWN)
-	//{
-	//	circles.add(App->physics->CreateCircle(App->input->GetMouseX(), App->input->GetMouseY(), 25));
-	//	circles.getLast()->data->listener = this;
-	//}
-
-	if(App->input->GetKey(SDL_SCANCODE_2) == KEY_DOWN)
-	{
-		boxes.add(App->physics->CreateRectangle(App->input->GetMouseX(), App->input->GetMouseY(), 100, 50));
-	}
-
-	
-		// Pivot 0, 0
-	
 	
 
 	// Prepare for raycast ------------------------------------------------------
@@ -648,21 +510,15 @@ update_status ModuleSceneIntro::Update()
 
 	// All draw functions ------------------------------------------------------
 
-	//draw ball
-	int x, y;
-	circles.getLast()->data->GetPosition(x, y);
-	//App->renderer->Blit(pinball, x, y, NULL, 1.0f, circles.getLast()->data->GetRotation());
-
 	p2List_item<PhysBody*>* c = circles.getFirst();
 
-	/*while(c != NULL)
-	{
-		int x, y;
-		c->data->GetPosition(x, y);
-		if(c->data->Contains(App->input->GetMouseX(), App->input->GetMouseY()))
-			App->renderer->Blit(circle, x, y, NULL, 1.0f, c->data->GetRotation());
-		c = c->next;
-	}*/
+	//while(c != NULL)
+	//{
+	//	int x, y;
+	//	c->data->GetPosition(x, y);
+	//	App->renderer->Blit(pinball, x, y, &ball, 1.0f, c->data->GetRotation());
+	//	c = c->next;
+	//}
 
 	c = boxes.getFirst();
 
@@ -708,6 +564,16 @@ update_status ModuleSceneIntro::Update()
 
 void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
+	if ( bodyB == sensorentrance1 || bodyB == sensorentrance2 || bodyB == sensorentrance3)
+	{
+		changelvl = true;
+	}
+
+	if (bodyB == sensorfall)
+	{
+		goInit = true;
+	}
+
 	int x, y;
 
 	App->audio->PlayFx(bonus_fx);

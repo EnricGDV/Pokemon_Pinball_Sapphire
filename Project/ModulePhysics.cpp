@@ -322,7 +322,7 @@ update_status ModulePhysics::PostUpdate()
 
 	// TODO 3: If the player keeps pressing the mouse button, update
 	// target position and draw a red line between both anchor points
-	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT)
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && body_clicked != NULL)
 	{
 		mouse_joint->SetTarget({ PIXEL_TO_METERS(App->input->GetMouseX()), PIXEL_TO_METERS(App->input->GetMouseY()) });
 		App->renderer->DrawLine(METERS_TO_PIXELS(body_clicked->GetPosition().x), METERS_TO_PIXELS(body_clicked->GetPosition().y), App->input->GetMouseX(), App->input->GetMouseY(), 230, 0, 150);
