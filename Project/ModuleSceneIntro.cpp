@@ -45,12 +45,12 @@ bool ModuleSceneIntro::Start()
 
 	//create flippers
 	
-	boxes.add(App->physics->CreateRectangle(134, 600, 38, 10));
+	boxes.add(App->physics->CreateRectangle(134, 600, 39, 10));
 	boxes.getLast()->data->listener = this;
 	circles.add(App->physics->CreateCircle(133, 600, 2));
 	circles.getLast()->data->body->SetType(b2_staticBody);
 
-	boxes.add(App->physics->CreateRectangle(186, 600, 38, 10));
+	boxes.add(App->physics->CreateRectangle(186, 600, 39, 10));
 	boxes.getLast()->data->listener = this;
 	circles.add(App->physics->CreateCircle(226, 602, 2));
 	circles.getLast()->data->body->SetType(b2_staticBody);
