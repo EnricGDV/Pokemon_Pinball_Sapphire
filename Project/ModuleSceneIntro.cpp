@@ -165,6 +165,11 @@ bool ModuleSceneIntro::Start()
 	shroomish.PushBack({ 137, 1471, 41, 36 });
 	shroomish.speed = 0.02f;
 
+	shroomishHit.PushBack({ 178, 1458, 41, 47 });
+	shroomishHit.PushBack({ 222, 1458, 41, 47 });
+	shroomishHit.speed = 0.05f;
+	shroomishHit.loop = false;
+
 	//Pluse
 	plusle.PushBack({ 157, 1527, 34, 55 });
 	plusle.PushBack({ 193, 1527, 34, 55 });
@@ -325,9 +330,23 @@ update_status ModuleSceneIntro::Update()
 	App->renderer->Blit(pinball, 32, 172, &(mart.GetCurrentFrame()));
 
 	//Shroomish
-	App->renderer->Blit(pinball, 122, 195, &(shroomish.GetCurrentFrame()));
-	App->renderer->Blit(pinball, 177, 190, &(shroomish.GetCurrentFrame()));
-	App->renderer->Blit(pinball, 150, 230, &(shroomish.GetCurrentFrame()));
+	if (!srmshHit)
+	{
+		App->renderer->Blit(pinball, 122, 195, &(shroomish.GetCurrentFrame()));
+		App->renderer->Blit(pinball, 177, 190, &(shroomish.GetCurrentFrame()));
+		App->renderer->Blit(pinball, 150, 230, &(shroomish.GetCurrentFrame()));
+	}
+	else
+	{
+		App->renderer->Blit(pinball, 122, 193, &(shroomishHit.GetCurrentFrame()));
+		App->renderer->Blit(pinball, 177, 188, &(shroomishHit.GetCurrentFrame()));
+		App->renderer->Blit(pinball, 150, 228, &(shroomishHit.GetCurrentFrame()));
+		if (shroomishHit.Finished())
+		{
+			shroomishHit.Reset();
+			srmshHit = false;
+		}
+	}
 
 	//Wailmer
 	App->renderer->Blit(pinball, 260, 245, &(wailmer.GetCurrentFrame()));
@@ -653,6 +672,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	{
 		App->audio->PlayFx(points_fx);
 		score += 200;
+		srmshHit = true;
 		return;
 	}
 
