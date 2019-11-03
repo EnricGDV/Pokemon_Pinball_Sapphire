@@ -64,6 +64,7 @@ public:
 	bool goInit = false;
 	bool changelvl = false;
 	int balls = 2;
+	int prev_score = 0;
 	int score = 0;
 	int hi_score = 0;
 	char scores[5] = {};
@@ -73,10 +74,16 @@ public:
 	bool martPlus;
 	bool martMin;
 
+	bool pika = false;
+	bool pikaburst = false;
+
 	uint pikaLap;
 	uint pikaCount;
 	uint pikachu_pos;
-	uint bonus_fx;
+	uint spoink_fx;
+	uint flipper_fx;
+	uint points_fx;
+
 	p2Point<int> ray;
 	bool ray_on;
 

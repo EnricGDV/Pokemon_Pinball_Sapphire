@@ -32,7 +32,9 @@ bool ModuleSceneIntro::Start()
 
 	pinball = App->textures->Load("textures/spritesheet.png"); 
 	App->audio->PlayMusic("music/Sapphire_field.ogg", -1);
-	bonus_fx = App->audio->LoadFx("audio/bonus.wav");
+	spoink_fx = App->audio->LoadFx("audio/Throw.wav");
+	flipper_fx = App->audio->LoadFx("audio/Do.wav");
+	points_fx = App->audio->LoadFx("audio/Pokemon hit.wav");
 	font = App->fonts->Load("textures/Fonts.png", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ ");
 
 	//PHYSICS BODY CREATION//
@@ -68,7 +70,7 @@ bool ModuleSceneIntro::Start()
 	boxes.add(App->physics->CreateRectangle(365, 570, 25, 15));
 	boxes.getLast()->data->body->SetType(b2_kinematicBody);
 	boxes.add(App->physics->CreateRectangle(48, 588, 25, 35));
-	boxes.getLast()->data->body->SetType(b2_staticBody);
+	boxes.getLast()->data->body->SetType(b2_kinematicBody);
 	walls.add(App->physics->CreateChain(0, 0, wall_left, 20));
 	walls.add(App->physics->CreateChain(0, 0, wall_right, 20));
 	walls.add(App->physics->CreateChain(0, 0, level2, 96));
@@ -300,19 +302,6 @@ update_status ModuleSceneIntro::Update()
 		boxes.getFirst()->next->data->body->ApplyForceToCenter(b2Vec2(0, -200), 1);
 	}
 
-	//Pikachu
-	if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_DOWN)
-	{
-		pikachu_pos = 30;
-		boxes.getLast()->data->body->SetTransform({ PIXEL_TO_METERS(48), PIXEL_TO_METERS(588) }, boxes.getLast()->data->body->GetAngle());
-	}
-	else if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_DOWN)
-	{
-		pikachu_pos = 295;
-		boxes.getLast()->data->body->SetTransform({ PIXEL_TO_METERS(313), PIXEL_TO_METERS(588) }, boxes.getLast()->data->body->GetAngle());
-	}
-	App->renderer->Blit(pinball, pikachu_pos, 570, &(pikachu.GetCurrentFrame()));
-
 	//Draw Ball 
 	PhysBody* pokeball = circles.getFirst()->data;
 	int x, y;
@@ -359,10 +348,11 @@ update_status ModuleSceneIntro::Update()
 			pikaLap = 0;
 		}
 	}
-	if (App->input->GetKey(SDL_SCANCODE_L) == KEY_DOWN)
+	if (App->input->GetKey(SDL_SCANCODE_L) == KEY_DOWN || pika)
 	{
 		pikaLap = 1;
 		++pikaCount;
+		pika = false;
 	}
 	if (App->input->GetKey(SDL_SCANCODE_K) == KEY_DOWN)
 	{
@@ -371,6 +361,35 @@ update_status ModuleSceneIntro::Update()
 		pikaCharge2.Reset();
 		pikaCharge3.Reset();
 	}
+
+	//Pikachu
+	if (pikaCount >= 3)
+	{
+		if (App->input->GetKey(SDL_SCANCODE_LEFT) == KEY_DOWN)
+		{
+			pikachu_pos = 30;
+			boxes.getLast()->data->body->SetTransform({ PIXEL_TO_METERS(48), PIXEL_TO_METERS(588) }, boxes.getLast()->data->body->GetAngle());
+		}
+		else if (App->input->GetKey(SDL_SCANCODE_RIGHT) == KEY_DOWN)
+		{
+			pikachu_pos = 295;
+			boxes.getLast()->data->body->SetTransform({ PIXEL_TO_METERS(313), PIXEL_TO_METERS(588) }, boxes.getLast()->data->body->GetAngle());
+		}
+		App->renderer->Blit(pinball, pikachu_pos, 570, &(pikachu.GetCurrentFrame()));
+
+		if (pikaburst)
+		{
+			boxes.getLast()->data->body->SetLinearVelocity(b2Vec2(0, -10));
+			
+			pikaburst = false;
+		}
+		if (boxes.getLast()->data->body->GetPosition().y < PIXEL_TO_METERS(550));
+		{
+			int pos = pikachu_pos + 18;
+			boxes.getLast()->data->body->SetTransform({ PIXEL_TO_METERS(pos), PIXEL_TO_METERS(588) }, boxes.getLast()->data->body->GetAngle());
+		}
+	}
+		
 
 	//background 1 / 2
 	App->renderer->Blit(pinball, 0, 0, &background2);
@@ -441,10 +460,12 @@ update_status ModuleSceneIntro::Update()
 	if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_DOWN && spoinkable)
 	{
 		boxes.getLast()->prev->data->body->SetLinearVelocity(b2Vec2(0, 1));
+		App->audio->PlayFx(spoink_fx);
 	}
 	else if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_UP && spoinkable)
 	{
 		boxes.getLast()->prev->data->body->SetLinearVelocity(b2Vec2(0, -20));
+		
 	}
 	else if (boxes.getLast()->prev->data->body->GetPosition().y > PIXEL_TO_METERS(590) || boxes.getLast()->prev->data->body->GetPosition().y < PIXEL_TO_METERS(570))
 	{
@@ -519,15 +540,18 @@ update_status ModuleSceneIntro::Update()
 		{
 			hi_score = score;
 		}
-		App->renderer->DrawQuad({ SCREEN_WIDTH / 6, SCREEN_HEIGHT / 4,  250, 300 }, 0, 0, 0, 200);
+		App->renderer->DrawQuad({ SCREEN_WIDTH / 6, SCREEN_HEIGHT / 4,  250, 380 }, 0, 0, 0, 200);
 		App->fonts->BlitText(SCREEN_WIDTH / 6 + 30, SCREEN_HEIGHT / 4 + 30, font, "CURRENT SCORE");
-		App->fonts->BlitText(SCREEN_WIDTH / 6 + 80 , SCREEN_HEIGHT / 4 + 80 , font, std::to_string(score).c_str());
-		App->fonts->BlitText(SCREEN_WIDTH / 6 + 30, SCREEN_HEIGHT / 2 - 30, font, "HIGHEST SCORE");
-		App->fonts->BlitText(SCREEN_WIDTH / 6 + 80, SCREEN_HEIGHT / 2 + 20, font, std::to_string(hi_score).c_str());
-		App->fonts->BlitText(SCREEN_WIDTH / 6 + 70, SCREEN_HEIGHT / 2 + 80, font, "PRESS R");
+		App->fonts->BlitText(SCREEN_WIDTH / 6 + 45 , SCREEN_HEIGHT / 4 + 65 , font, std::to_string(score).c_str());
+		App->fonts->BlitText(SCREEN_WIDTH / 6 + 30, SCREEN_HEIGHT / 2 - 40, font, "PREVIOUS SCORE");
+		App->fonts->BlitText(SCREEN_WIDTH / 6 + 45, SCREEN_HEIGHT / 2 - 5, font, std::to_string(prev_score).c_str());
+		App->fonts->BlitText(SCREEN_WIDTH / 6 + 30, SCREEN_HEIGHT / 2 + 70, font, "HIGHEST SCORE");
+		App->fonts->BlitText(SCREEN_WIDTH / 6 + 85, SCREEN_HEIGHT / 2 + 120, font, std::to_string(hi_score).c_str());
+		App->fonts->BlitText(SCREEN_WIDTH / 6 + 70, SCREEN_HEIGHT / 2 + 185, font, "PRESS R");
 		spoinkable = false;
 		if (App->input->GetKey(SDL_SCANCODE_R) == KEY_DOWN)
 		{
+			prev_score = score;
 			score = 0;
 			spoinkable = true;
 			lose = false;
@@ -537,6 +561,12 @@ update_status ModuleSceneIntro::Update()
 	//UI
 	App->fonts->BlitText(5, SCREEN_HEIGHT - 30, font, std::to_string(score).c_str());
 	App->fonts->BlitText(SCREEN_WIDTH - 20, SCREEN_HEIGHT - 30, font, std::to_string(balls).c_str());
+
+	//Move ball to mouse
+	if (App->input->GetKey(SDL_SCANCODE_X) == KEY_DOWN)
+	{
+		circles.getFirst()->data->body->SetTransform({ PIXEL_TO_METERS(App->input->GetMouseX()), PIXEL_TO_METERS(App->input->GetMouseY()) }, circles.getFirst()->data->body->GetAngle());
+	}
 
 	// Prepare for raycast ------------------------------------------------------
 	
@@ -565,22 +595,17 @@ update_status ModuleSceneIntro::Update()
 
 void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 {
+	//lvl change
 	if ( bodyB == sensorentrance1 || bodyB == sensorentrance2 ||(bodyB->body->GetLinearVelocity().y < 0 && bodyB == sensorentrance3))
 	{
 		changelvl = true;
 	}
 
+	//lose
 	if (bodyB == sensorfall && balls > 0)
 	{
 		goInit = true;
 		balls--;
-		return;
-	}
-
-	if (bodyB == sensormart)
-	{
-		score += 300;
-		balls++;
 		return;
 	}
 
@@ -595,6 +620,7 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		
 	}
 
+	//minum & plusle  & mart
 	if (bodyB == sensorminum)
 	{
 		martMin = !martMin;
@@ -605,32 +631,46 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		martPlus = !martPlus;
 	}
 
+	if (bodyB == sensormart)
+	{
+		App->audio->PlayFx(points_fx);
+		score += 300;
+		balls++;
+		return;
+	}
+
+	//shroomish
 	if (bodyB == circles.getLast()->prev->data || bodyB == circles.getLast()->prev->prev->data || bodyB == circles.getLast()->prev->prev->prev->data)
 	{
+		App->audio->PlayFx(points_fx);
 		score += 200;
 		return;
 	}
 
+	//bumper collision
 	if (bodyB == bumper_l || bodyB == bumper_r)
 	{
+		App->audio->PlayFx(points_fx);
 		score += 100;
 		return;
 	}
-
-	int x, y;
-
-	App->audio->PlayFx(bonus_fx);
-
-	/*
-	if(bodyA)
+	
+	//flipper fx
+	if (bodyB == boxes.getFirst()->data || bodyB == boxes.getFirst()->next->data)
 	{
-		bodyA->GetPosition(x, y);
-		App->renderer->DrawCircle(x, y, 50, 100, 100, 100);
+		App->audio->PlayFx(flipper_fx);
+		return;
 	}
 
-	if(bodyB)
+	//pikacharge
+	if (bodyB == sensorpikachu)
 	{
-		bodyB->GetPosition(x, y);
-		App->renderer->DrawCircle(x, y, 50, 100, 100, 100);
-	}*/
+		pika = true;
+	}
+
+	//pikachu
+	if (bodyB == boxes.getLast()->data)
+	{
+		pikaburst = true;
+	}
 }
