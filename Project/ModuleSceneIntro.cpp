@@ -1,4 +1,6 @@
 #include "Globals.h"
+#include <iostream>
+#include <string>
 #include "Application.h"
 #include "ModuleRender.h"
 #include "ModuleSceneIntro.h"
@@ -7,6 +9,7 @@
 #include "ModuleAudio.h"
 #include "ModulePhysics.h"
 #include "ModuleAudio.h"
+#include "ModuleFonts.h"
 
 
 ModuleSceneIntro::ModuleSceneIntro(Application* app, bool start_enabled) : Module(app, start_enabled)
@@ -30,6 +33,7 @@ bool ModuleSceneIntro::Start()
 	pinball = App->textures->Load("textures/spritesheet.png"); 
 	App->audio->PlayMusic("music/Sapphire_field.ogg", -1);
 	bonus_fx = App->audio->LoadFx("audio/bonus.wav");
+	font = App->fonts->Load("textures/Fonts.png", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ ");
 
 	//PHYSICS BODY CREATION//
 
@@ -273,11 +277,11 @@ update_status ModuleSceneIntro::Update()
 	App->renderer->Blit(pinball, 253, 256, &(water.GetCurrentFrame()));
 
 	//Spoink
-	if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_DOWN)
+	if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_DOWN && spoinkable)
 	{
 		App->renderer->Blit(pinball, 350, 550, &(downSpoink.GetCurrentFrame()));
 	}
-	else if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT)
+	else if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_REPEAT && spoinkable)
 	{
 		App->renderer->Blit(pinball, 348, 550, &(redSpoink.GetCurrentFrame()));
 	}
@@ -421,12 +425,12 @@ update_status ModuleSceneIntro::Update()
 		}
 	}
 
-	if ((martMin || martPlus) && circles.count() == 3)
+	if ((martMin || martPlus) && circles.count() == 6)
 	{
 		circles.add(App->physics->CreateCircle(105, 292, 10));
 		circles.getLast()->data->body->SetType(b2_staticBody);
 	}
-	else if (!martMin && !martPlus && circles.count() == 4)
+	else if (!martMin && !martPlus && circles.count() == 7)
 	{
 		circles.getLast()->data->body->GetWorld()->DestroyBody(circles.getLast()->data->body);
 		circles.del(circles.getLast());
@@ -434,11 +438,11 @@ update_status ModuleSceneIntro::Update()
 
 	//Spoink
 
-	if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_DOWN)
+	if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_DOWN && spoinkable)
 	{
 		boxes.getLast()->prev->data->body->SetLinearVelocity(b2Vec2(0, 1));
 	}
-	else if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_UP)
+	else if (App->input->GetKey(SDL_SCANCODE_DOWN) == KEY_UP && spoinkable)
 	{
 		boxes.getLast()->prev->data->body->SetLinearVelocity(b2Vec2(0, -20));
 	}
@@ -507,14 +511,32 @@ update_status ModuleSceneIntro::Update()
 		changelvl = false;
 		
 	}
-	
-	//if(App->input->GetKey(SDL_SCANCODE_SPACE) == KEY_DOWN)
-	//{
-	//	ray_on = !ray_on;
-	//	ray.x = App->input->GetMouseX();
-	//	ray.y = App->input->GetMouseY();
-	//}
-	
+
+	//Lose screen
+	if (lose)
+	{
+		if (score > hi_score)
+		{
+			hi_score = score;
+		}
+		App->renderer->DrawQuad({ SCREEN_WIDTH / 6, SCREEN_HEIGHT / 4,  250, 300 }, 0, 0, 0, 200);
+		App->fonts->BlitText(SCREEN_WIDTH / 6 + 30, SCREEN_HEIGHT / 4 + 30, font, "CURRENT SCORE");
+		App->fonts->BlitText(SCREEN_WIDTH / 6 + 80 , SCREEN_HEIGHT / 4 + 80 , font, std::to_string(score).c_str());
+		App->fonts->BlitText(SCREEN_WIDTH / 6 + 30, SCREEN_HEIGHT / 2 - 30, font, "HIGHEST SCORE");
+		App->fonts->BlitText(SCREEN_WIDTH / 6 + 80, SCREEN_HEIGHT / 2 + 20, font, std::to_string(hi_score).c_str());
+		App->fonts->BlitText(SCREEN_WIDTH / 6 + 70, SCREEN_HEIGHT / 2 + 80, font, "PRESS R");
+		spoinkable = false;
+		if (App->input->GetKey(SDL_SCANCODE_R) == KEY_DOWN)
+		{
+			score = 0;
+			spoinkable = true;
+			lose = false;
+		}
+	}
+
+	//UI
+	App->fonts->BlitText(5, SCREEN_HEIGHT - 30, font, std::to_string(score).c_str());
+	App->fonts->BlitText(SCREEN_WIDTH - 20, SCREEN_HEIGHT - 30, font, std::to_string(balls).c_str());
 
 	// Prepare for raycast ------------------------------------------------------
 	
@@ -524,44 +546,6 @@ update_status ModuleSceneIntro::Update()
 	int ray_hit = ray.DistanceTo(mouse);
 
 	fVector normal(0.0f, 0.0f);
-
-	// All draw functions ------------------------------------------------------
-
-	p2List_item<PhysBody*>* c = circles.getFirst();
-
-	//while(c != NULL)
-	//{
-	//	int x, y;
-	//	c->data->GetPosition(x, y);
-	//	App->renderer->Blit(pinball, x, y, &ball, 1.0f, c->data->GetRotation());
-	//	c = c->next;
-	//}
-
-	c = boxes.getFirst();
-
-	/*while(c != NULL)
-	{
-		int x, y;
-		c->data->GetPosition(x, y);
-		App->renderer->Blit(box, x, y, NULL, 1.0f, c->data->GetRotation());
-		if(ray_on)
-		{
-			int hit = c->data->RayCast(ray.x, ray.y, mouse.x, mouse.y, normal.x, normal.y);
-			if(hit >= 0)
-				ray_hit = hit;
-		}
-		c = c->next;
-	}*/
-
-	c = walls.getFirst();
-
-	/*while(c != NULL)
-	{
-		int x, y;
-		c->data->GetPosition(x, y);
-		App->renderer->Blit(rick, x, y, NULL, 1.0f, c->data->GetRotation());
-		c = c->next;
-	}*/
 
 	// ray -----------------
 	if(ray_on == true)
@@ -586,9 +570,51 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 		changelvl = true;
 	}
 
-	if (bodyB == sensorfall)
+	if (bodyB == sensorfall && balls > 0)
 	{
 		goInit = true;
+		balls--;
+		return;
+	}
+
+	if (bodyB == sensormart)
+	{
+		score += 300;
+		balls++;
+		return;
+	}
+
+	if (bodyB == sensorfall && balls <= 0)
+	{
+		goInit = true;
+		balls = 2;
+		martPlus = true;
+		martMin = true;
+		lose = true;
+		
+		
+	}
+
+	if (bodyB == sensorminum)
+	{
+		martMin = !martMin;
+	}
+
+	if (bodyB == sensorplusle)
+	{
+		martPlus = !martPlus;
+	}
+
+	if (bodyB == circles.getLast()->prev->data || bodyB == circles.getLast()->prev->prev->data || bodyB == circles.getLast()->prev->prev->prev->data)
+	{
+		score += 200;
+		return;
+	}
+
+	if (bodyB == bumper_l || bodyB == bumper_r)
+	{
+		score += 100;
+		return;
 	}
 
 	int x, y;

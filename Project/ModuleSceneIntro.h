@@ -40,6 +40,9 @@ public:
 	SDL_Rect background2;
 	SDL_Rect pikaStatic;
 
+	//font
+	int font;
+
 	//sensors
 	PhysBody* sensorfall;
 	PhysBody* sensorminum;
@@ -54,12 +57,28 @@ public:
 	PhysBody* sensorzigzagoon;
 	PhysBody* sensorlights;
 
-	//booleans
+	//booleans & variables
 	bool sensed;
 	bool lvl1 = false;
 	bool lvl2 = true;
 	bool goInit = false;
 	bool changelvl = false;
+	int balls = 2;
+	int score = 0;
+	int hi_score = 0;
+	char scores[5] = {};
+	int lose = false;
+	int spoinkable = true;
+	
+	bool martPlus;
+	bool martMin;
+
+	uint pikaLap;
+	uint pikaCount;
+	uint pikachu_pos;
+	uint bonus_fx;
+	p2Point<int> ray;
+	bool ray_on;
 
 	//animations
 	SDL_Texture* pinball;
@@ -142,13 +161,4 @@ public:
 	69, 94, 79, 51, 110, 38, 132, 27, 152, 18, 192,16, 222, 20, 264, 37, 310, 63, 365
 	};
 	
-	bool martPlus;
-	bool martMin;
-
-	uint pikaLap;
-	uint pikaCount;
-	uint pikachu_pos;
-	uint bonus_fx;
-	p2Point<int> ray;
-	bool ray_on;
 };

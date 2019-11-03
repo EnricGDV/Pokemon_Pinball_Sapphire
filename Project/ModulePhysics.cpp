@@ -16,7 +16,7 @@ ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app,
 {
 	world = NULL;
 	mouse_joint = NULL;
-	debug = true;
+	debug = false;
 }
 
 // Destructor
@@ -36,9 +36,9 @@ bool ModulePhysics::Start()
 	ground = world->CreateBody(&bd);
 
 	// big static circle as "ground" in the middle of the screen
-	/*int x = SCREEN_WIDTH / 2;
-	int y = SCREEN_HEIGHT / 1.5f;
-	int diameter = SCREEN_WIDTH / 2;
+	int x = SCREEN_WIDTH * 2;
+	int y = SCREEN_HEIGHT * 5;
+	int diameter = 1;
 
 	b2BodyDef body;
 	body.type = b2_staticBody;
@@ -51,7 +51,7 @@ bool ModulePhysics::Start()
 
 	b2FixtureDef fixture;
 	fixture.shape = &shape;
-	big_ball->CreateFixture(&fixture);*/
+	big_ball->CreateFixture(&fixture);
 
 	return true;
 }
@@ -310,7 +310,8 @@ update_status ModulePhysics::PostUpdate()
 	if (body_clicked != NULL)
 	{
 		b2MouseJointDef def;
-		def.bodyA = ground; def.bodyB = body_clicked;
+		def.bodyA = ground; 
+		def.bodyB = body_clicked;
 		def.target = { PIXEL_TO_METERS(App->input->GetMouseX()), PIXEL_TO_METERS(App->input->GetMouseY()) };
 		def.dampingRatio = 0.5f;
 		def.frequencyHz = 2.0f;
@@ -324,11 +325,18 @@ update_status ModulePhysics::PostUpdate()
 	// target position and draw a red line between both anchor points
 	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_REPEAT && body_clicked != NULL)
 	{
-		mouse_joint->SetTarget({ PIXEL_TO_METERS(App->input->GetMouseX()), PIXEL_TO_METERS(App->input->GetMouseY()) });
+		b2Vec2 target = { PIXEL_TO_METERS(App->input->GetMouseX()), PIXEL_TO_METERS(App->input->GetMouseY()) };
+		mouse_joint->SetTarget(target);
 		App->renderer->DrawLine(METERS_TO_PIXELS(body_clicked->GetPosition().x), METERS_TO_PIXELS(body_clicked->GetPosition().y), App->input->GetMouseX(), App->input->GetMouseY(), 230, 0, 150);
 	}
 	
 	// TODO 4: If the player releases the mouse button, destroy the joint
+	if (App->input->GetMouseButton(SDL_BUTTON_LEFT) == KEY_UP && body_clicked != NULL)
+	{
+		world->DestroyJoint(mouse_joint);
+		body_clicked = NULL;
+		mouse_joint = NULL;
+	}
 
 	return UPDATE_CONTINUE;
 }
