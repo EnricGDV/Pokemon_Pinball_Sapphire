@@ -330,21 +330,43 @@ update_status ModuleSceneIntro::Update()
 	App->renderer->Blit(pinball, 32, 172, &(mart.GetCurrentFrame()));
 
 	//Shroomish
-	if (!srmshHit)
+	if (!srmshHit1 && !srmshHit2 && !srmshHit3)
 	{
 		App->renderer->Blit(pinball, 122, 195, &(shroomish.GetCurrentFrame()));
 		App->renderer->Blit(pinball, 177, 190, &(shroomish.GetCurrentFrame()));
 		App->renderer->Blit(pinball, 150, 230, &(shroomish.GetCurrentFrame()));
 	}
-	else
+	else if (srmshHit2)
 	{
 		App->renderer->Blit(pinball, 122, 193, &(shroomishHit.GetCurrentFrame()));
+		App->renderer->Blit(pinball, 177, 190, &(shroomish.GetCurrentFrame()));
+		App->renderer->Blit(pinball, 150, 230, &(shroomish.GetCurrentFrame()));
+		if (shroomishHit.Finished())
+		{
+			shroomishHit.Reset();
+			srmshHit2 = false;
+		}
+	}
+	else if (srmshHit3)
+	{
+		App->renderer->Blit(pinball, 122, 195, &(shroomish.GetCurrentFrame()));
 		App->renderer->Blit(pinball, 177, 188, &(shroomishHit.GetCurrentFrame()));
+		App->renderer->Blit(pinball, 150, 230, &(shroomish.GetCurrentFrame()));
+		if (shroomishHit.Finished())
+		{
+			shroomishHit.Reset();
+			srmshHit3 = false;
+		}
+	}
+	else if (srmshHit1)
+	{
+		App->renderer->Blit(pinball, 122, 195, &(shroomish.GetCurrentFrame()));
+		App->renderer->Blit(pinball, 177, 190, &(shroomish.GetCurrentFrame()));
 		App->renderer->Blit(pinball, 150, 228, &(shroomishHit.GetCurrentFrame()));
 		if (shroomishHit.Finished())
 		{
 			shroomishHit.Reset();
-			srmshHit = false;
+			srmshHit1 = false;
 		}
 	}
 
@@ -578,6 +600,7 @@ update_status ModuleSceneIntro::Update()
 		spoinkable = false;
 		if (App->input->GetKey(SDL_SCANCODE_R) == KEY_DOWN)
 		{
+			pikaCount = 0;
 			prev_score = score;
 			score = 0;
 			spoinkable = true;
@@ -672,7 +695,13 @@ void ModuleSceneIntro::OnCollision(PhysBody* bodyA, PhysBody* bodyB)
 	{
 		App->audio->PlayFx(points_fx);
 		score += 200;
-		srmshHit = true;
+		if (bodyB == circles.getLast()->prev->data)
+			srmshHit1 = true;
+		else if (bodyB == circles.getLast()->prev->prev->data)
+			srmshHit2 = true;
+		else if (bodyB == circles.getLast()->prev->prev->prev->data)
+			srmshHit3 = true;
+
 		return;
 	}
 

@@ -77,7 +77,9 @@ public:
 	bool martPlus;
 	bool martMin;
 
-	bool srmshHit = false;
+	bool srmshHit1 = false;
+	bool srmshHit2 = false;
+	bool srmshHit3 = false;
 
 	bool pika = false;
 	bool pikaburst = false;
